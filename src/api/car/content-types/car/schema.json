@@ -1,0 +1,72 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cars",
+  "info": {
+    "singularName": "car",
+    "pluralName": "cars",
+    "displayName": "car",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "make": {
+      "type": "string",
+      "required": true
+    },
+    "model": {
+      "type": "string",
+      "required": true
+    },
+    "year": {
+      "type": "string",
+      "required": true
+    },
+    "unavailable_dates": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::unavailable-date.unavailable-date",
+      "mappedBy": "car"
+    },
+    "dailyRate": {
+      "type": "integer",
+      "required": true
+    },
+    "primaryImg": {
+      "type": "text",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "suv",
+        "car",
+        "truck"
+      ],
+      "required": true
+    },
+    "subtype": {
+      "type": "enumeration",
+      "enum": [
+        "ev",
+        "luxury ev",
+        "luxury",
+        "economy"
+      ]
+    },
+    "reservations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reservation.reservation",
+      "mappedBy": "car"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "cars"
+    }
+  }
+}

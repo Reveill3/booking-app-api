@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "unavailable_dates",
+  "info": {
+    "singularName": "unavailable-date",
+    "pluralName": "unavailable-dates",
+    "displayName": "unavailableDate",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "date": {
+      "type": "datetime"
+    },
+    "car": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::car.car",
+      "inversedBy": "unavailable_dates"
+    }
+  }
+}
