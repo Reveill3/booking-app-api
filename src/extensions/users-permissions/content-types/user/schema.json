@@ -68,6 +68,22 @@
       "relation": "oneToMany",
       "target": "api::car.car",
       "mappedBy": "users_permissions_user"
+    },
+    "first_name": {
+      "type": "string",
+      "required": false
+    },
+    "last_name": {
+      "type": "string",
+      "required": false
+    },
+    "address": {
+      "type": "text",
+      "required": false
+    },
+    "phone": {
+      "type": "text",
+      "required": false
     }
   }
 }
