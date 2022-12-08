@@ -85,11 +85,17 @@
       "type": "text",
       "required": false
     },
-    "insurance1": {
-      "type": "string"
+    "insurance": {
+      "type": "json"
     },
-    "insurance2": {
-      "type": "string"
+    "insuranceImgs": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": true,
+      "private": true
     }
   }
 }
