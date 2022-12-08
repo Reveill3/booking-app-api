@@ -84,6 +84,12 @@
     "phone": {
       "type": "text",
       "required": false
+    },
+    "insurance1": {
+      "type": "string"
+    },
+    "insurance2": {
+      "type": "string"
     }
   }
 }
