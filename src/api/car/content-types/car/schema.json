@@ -24,12 +24,6 @@
       "type": "string",
       "required": true
     },
-    "unavailable_dates": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::unavailable-date.unavailable-date",
-      "mappedBy": "car"
-    },
     "dailyRate": {
       "type": "integer",
       "required": true
@@ -67,6 +61,12 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "cars"
+    },
+    "unavailable_dates": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::unavailable-date.unavailable-date",
+      "mappedBy": "car"
     }
   }
 }
