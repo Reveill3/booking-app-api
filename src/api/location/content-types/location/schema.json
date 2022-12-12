@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "locations",
+  "info": {
+    "singularName": "location",
+    "pluralName": "locations",
+    "displayName": "Location",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "shortName": {
+      "type": "string"
+    },
+    "add_ons": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::add-on.add-on",
+      "inversedBy": "locations"
+    },
+    "cars": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::car.car",
+      "inversedBy": "locations"
+    },
+    "address": {
+      "type": "string"
+    },
+    "visible": {
+      "type": "boolean",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "airport",
+        "hotel",
+        "other"
+      ]
+    }
+  }
+}

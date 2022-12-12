@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "add_ons",
+  "info": {
+    "singularName": "add-on",
+    "pluralName": "add-ons",
+    "displayName": "addOn"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "flat",
+        "percentage"
+      ]
+    },
+    "amount": {
+      "type": "decimal"
+    },
+    "cars": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::car.car",
+      "inversedBy": "add_ons"
+    },
+    "locations": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::location.location",
+      "mappedBy": "add_ons"
+    }
+  }
+}

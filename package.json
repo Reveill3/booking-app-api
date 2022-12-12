@@ -17,6 +17,7 @@
     "@strapi/strapi": "4.5.3",
     "bcrypt": "^5.1.0",
     "better-sqlite3": "7.4.6",
+    "joi": "^17.7.0",
     "mysql": "^2.18.1"
   },
   "author": {

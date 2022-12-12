@@ -67,6 +67,18 @@
       "relation": "oneToMany",
       "target": "api::unavailable-date.unavailable-date",
       "mappedBy": "car"
+    },
+    "add_ons": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::add-on.add-on",
+      "inversedBy": "cars"
+    },
+    "locations": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::location.location",
+      "mappedBy": "cars"
     }
   }
 }
