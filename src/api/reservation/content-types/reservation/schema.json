@@ -4,7 +4,8 @@
   "info": {
     "singularName": "reservation",
     "pluralName": "reservations",
-    "displayName": "Reservation"
+    "displayName": "Reservation",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -22,6 +23,14 @@
       "relation": "manyToOne",
       "target": "api::car.car",
       "inversedBy": "reservations"
+    },
+    "location": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::location.location"
+    },
+    "stripeId": {
+      "type": "string"
     }
   }
 }
