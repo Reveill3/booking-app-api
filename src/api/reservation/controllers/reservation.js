@@ -44,24 +44,43 @@ module.exports = createCoreController(
           fields: ["make", "model", "year"],
         });
 
-        const session = await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
-          mode: "setup",
-          success_url: process.env.CLIENT_URL + "?success=true",
-          cancel_url: process.env.CLIENT_URL + "?success=false",
+        const customer = await stripe.customers.create({
+          email: ctx.state.user.email,
+          name: `${ctx.state.user.first_name} ${ctx.state.user.last_name}`,
+          metadata: {
+            userId: ctx.state.user.id,
+          },
         });
 
-        reservationObject = {
+        const reservationObject = {
           location: location,
           car: car,
           start: start,
           end: end,
-          stripeId: session.id,
+          total: price,
+          users_permissions_user: ctx.state.user.id,
         };
 
-        return await strapi.service("api::reservation.reservation").create({
-          data: reservationObject,
+        const reservation = await strapi
+          .service("api::reservation.reservation")
+          .create({
+            data: reservationObject,
+          });
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          mode: "setup",
+          customer: customer.id,
+          success_url: process.env.CLIENT_URL + "?success=true",
+          cancel_url: process.env.CLIENT_URL + "?success=false",
+          metadata: {
+            total: price,
+            reservation: reservation.id,
+          },
         });
+        console.log(session.url);
+
+        return reservation;
       } catch (error) {
         ctx.response.status = 500;
         return { error };
@@ -77,7 +96,7 @@ module.exports = createCoreController(
         event = stripe.webhooks.constructEvent(
           ctx.request.body[unparsed],
           sig,
-          "whsec_bfcc2ae708b99838a0c79e4d2c6564d957b706a36c045aa7cd84c769ccb4f619"
+          process.env.STRIPE_WEBHOOK_SECRET
         );
       } catch (err) {
         ctx.response.status = 400;
@@ -87,13 +106,58 @@ module.exports = createCoreController(
       switch (event.type) {
         case "checkout.session.completed":
           const handleSessionCompleted = async () => {
-            const session = stripe.checkout.sessions.retrieve(
-              event.data.object.id
-            );
-            return session;
+            try {
+              const session = await stripe.checkout.sessions.retrieve(
+                event.data.object.id
+              );
+              const setupIntent = await stripe.setupIntents.retrieve(
+                session.setup_intent
+              );
+              const paymentIntent = await stripe.paymentIntents.create({
+                amount: session.metadata.total * 100,
+                currency: "usd",
+                payment_method_types: ["card"],
+                customer: setupIntent.customer,
+                payment_method: setupIntent.payment_method,
+                setup_future_usage: "off_session",
+                capture_method: "manual",
+              });
+              // add payment intent to reservation
+              return await strapi
+                .service("api::reservation.reservation")
+                .update(session.metadata.reservation, {
+                  data: {
+                    paymentIntentId: paymentIntent.id,
+                    stripeId: session.id,
+                  },
+                });
+            } catch (error) {
+              ctx.response.status = 500;
+              ctx.badRequest(error.message, null);
+            }
+
+            return setupIntent;
           };
-          return handleSessionCompleted();
+          return await handleSessionCompleted();
       }
+    },
+    async authorizePayment(ctx) {
+      const { paymentIntentId } = ctx.request.body;
+      const authorized = await stripe.paymentIntents.confirm(paymentIntentId);
+      return authorized;
+    },
+    async capturePayment(ctx) {
+      const { paymentIntentId } = ctx.request.body;
+      const captured = await stripe.paymentIntents.capture(paymentIntentId);
+      return captured;
+    },
+    async getMyReservations(ctx) {
+      const reservations = await strapi
+        .service("api::reservation.reservation")
+        .find({
+          users_permissions_user: ctx.state.user.id,
+        });
+      return reservations;
     },
   })
 );

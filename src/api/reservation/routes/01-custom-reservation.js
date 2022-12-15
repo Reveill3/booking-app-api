@@ -13,5 +13,20 @@ module.exports = {
         auth: false,
       },
     },
+    {
+      method: "POST",
+      path: "/reservation/authorize",
+      handler: "reservation.authorizePayment",
+    },
+    {
+      method: "POST",
+      path: "/reservation/capture",
+      handler: "reservation.capturePayment",
+    },
+    {
+      method: "GET",
+      path: "/reservations/me",
+      handler: "reservation.getMyReservations",
+    },
   ],
 };
