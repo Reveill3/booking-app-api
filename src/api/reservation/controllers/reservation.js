@@ -59,6 +59,7 @@ module.exports = createCoreController(
           end: end,
           total: price,
           users_permissions_user: ctx.state.user.id,
+          status: "awaiting_session_complete",
         };
 
         const reservation = await strapi
@@ -129,6 +130,7 @@ module.exports = createCoreController(
                   data: {
                     paymentIntentId: paymentIntent.id,
                     stripeId: session.id,
+                    status: "awaiting_auth",
                   },
                 });
             } catch (error) {
@@ -142,9 +144,18 @@ module.exports = createCoreController(
       }
     },
     async authorizePayment(ctx) {
-      const { paymentIntentId } = ctx.request.body;
+      const { paymentIntentId, reservationId } = ctx.request.body;
       try {
         const authorized = await stripe.paymentIntents.confirm(paymentIntentId);
+        await strapi.entityService.update(
+          "api::reservation.reservation",
+          reservationId,
+          {
+            data: {
+              status: "awaiting_capture",
+            },
+          }
+        );
         return true;
       } catch (error) {
         console.log(error);
@@ -152,9 +163,22 @@ module.exports = createCoreController(
       }
     },
     async capturePayment(ctx) {
-      const { paymentIntentId } = ctx.request.body;
-      const captured = await stripe.paymentIntents.capture(paymentIntentId);
-      return captured;
+      const { paymentIntentId, reservationId } = ctx.request.body;
+      try {
+        const captured = await stripe.paymentIntents.capture(paymentIntentId);
+        await strapi.entityService.update(
+          "api::reservation.reservation",
+          reservationId,
+          {
+            data: {
+              status: "completed",
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     },
     async getMyReservations(ctx) {
       const query = ctx.query;
