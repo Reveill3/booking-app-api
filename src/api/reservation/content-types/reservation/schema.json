@@ -44,6 +44,16 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "awaiting_session_complete",
+        "awaiting_auth",
+        "awaiting_capture",
+        "completed",
+        "cancelled"
+      ]
     }
   }
 }

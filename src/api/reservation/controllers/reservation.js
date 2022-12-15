@@ -143,8 +143,13 @@ module.exports = createCoreController(
     },
     async authorizePayment(ctx) {
       const { paymentIntentId } = ctx.request.body;
-      const authorized = await stripe.paymentIntents.confirm(paymentIntentId);
-      return authorized;
+      try {
+        const authorized = await stripe.paymentIntents.confirm(paymentIntentId);
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
     },
     async capturePayment(ctx) {
       const { paymentIntentId } = ctx.request.body;
@@ -152,11 +157,14 @@ module.exports = createCoreController(
       return captured;
     },
     async getMyReservations(ctx) {
-      const reservations = await strapi
-        .service("api::reservation.reservation")
-        .find({
-          users_permissions_user: ctx.state.user.id,
-        });
+      const query = ctx.query;
+      const reservations = await strapi.entityService.findMany(
+        "api::reservation.reservation",
+        {
+          filters: { users_permissions_user: ctx.state.user.id },
+          populate: ["car", "location"],
+        }
+      );
       return reservations;
     },
   })
