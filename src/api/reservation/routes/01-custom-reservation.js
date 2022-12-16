@@ -11,6 +11,7 @@ module.exports = {
       handler: "reservation.webhooks",
       config: {
         auth: false,
+        policies: ["global::isOwner"],
       },
     },
     {

@@ -114,6 +114,11 @@ module.exports = createCoreController(
               const setupIntent = await stripe.setupIntents.retrieve(
                 session.setup_intent
               );
+
+              const customer = await stripe.customers.retrieve(
+                setupIntent.customer
+              );
+
               const paymentIntent = await stripe.paymentIntents.create({
                 amount: session.metadata.total * 100,
                 currency: "usd",
@@ -131,6 +136,7 @@ module.exports = createCoreController(
                     paymentIntentId: paymentIntent.id,
                     stripeId: session.id,
                     status: "awaiting_auth",
+                    originalUser: customer.metadata.userId,
                   },
                 });
             } catch (error) {
