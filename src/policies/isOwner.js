@@ -1,26 +1,39 @@
+const utils = require("@strapi/utils");
+const { UnauthorizedError, PolicyError } = utils.errors;
+
 module.exports = async (policyContext, config, { strapi }) => {
-  if (policyContext.request.originalUrl?.includes("webhooks")) {
-    return true;
-  }
   if (!policyContext.state.user) {
-    policyContext.unauthorized(
-      "You need to be logged in to perform this action"
+    throw new UnauthorizedError(
+      "You need to be logged in to perform this action",
+      { policy: "isOwner" }
     );
-    return false;
   }
   if (policyContext.state.user) {
-    const item = await strapi.entityService.findOne(
-      policyContext.request.body.entity,
-      policyContext.request.body.id,
-      {
-        filters: { users_permissions_user: policyContext.state.user.id },
+    try {
+      const items = await strapi.entityService.findMany(
+        policyContext.request.body.entity,
+        {
+          populate: ["users_permissions_user"],
+          filters: {
+            users_permissions_user: { id: policyContext.state.user.id },
+            id: policyContext.params.id,
+          },
+        }
+      );
+      if (items.length === 0) {
+        throw new UnauthorizedError("You can only edit your own reservations", {
+          policy: "isOwner",
+        });
       }
-    );
-    if (!item) {
-      policyContext.unauthorized("You are not allowed to perform this action");
-      return false;
+      return true;
+    } catch (error) {
+      throw new PolicyError("Server error while fetching item", {
+        policy: "isOwner",
+        error,
+      });
     }
-    return true;
   }
-  return false;
+  throw new UnauthorizedError("You are not authorized to perform this action", {
+    policy: "isOwner",
+  });
 };

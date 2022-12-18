@@ -11,7 +11,6 @@ module.exports = {
       handler: "reservation.webhooks",
       config: {
         auth: false,
-        policies: ["global::isOwner"],
       },
     },
     {
@@ -28,6 +27,22 @@ module.exports = {
       method: "GET",
       path: "/reservations/me",
       handler: "reservation.getMyReservations",
+    },
+    {
+      method: "POST",
+      path: "/reservations/me/:id",
+      handler: "reservation.deleteOwn",
+      config: {
+        policies: ["global::isOwner"],
+      },
+    },
+    {
+      method: "POST",
+      path: "/reservations/stripesession/:id",
+      handler: "reservation.getStripeUrl",
+      config: {
+        policies: ["global::isOwner"],
+      },
     },
   ],
 };

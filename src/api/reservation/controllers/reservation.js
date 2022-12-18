@@ -80,6 +80,14 @@ module.exports = createCoreController(
           },
         });
         console.log(session.url);
+        // add payment intent to reservation
+        return await strapi
+          .service("api::reservation.reservation")
+          .update(reservation.id, {
+            data: {
+              stripeUrl: session.url,
+            },
+          });
 
         return reservation;
       } catch (error) {
@@ -134,14 +142,12 @@ module.exports = createCoreController(
                 .update(session.metadata.reservation, {
                   data: {
                     paymentIntentId: paymentIntent.id,
-                    stripeId: session.id,
+                    stripeUrl: session.url,
                     status: "awaiting_auth",
-                    originalUser: customer.metadata.userId,
                   },
                 });
             } catch (error) {
-              ctx.response.status = 500;
-              ctx.badRequest(error.message, null);
+              ctx.internalServerError("Error on session completed");
             }
 
             return setupIntent;
@@ -165,7 +171,7 @@ module.exports = createCoreController(
         return true;
       } catch (error) {
         console.log(error);
-        return false;
+        ctx.internalServerError("Error authorizing payment");
       }
     },
     async capturePayment(ctx) {
@@ -181,9 +187,10 @@ module.exports = createCoreController(
             },
           }
         );
+        return true;
       } catch (error) {
         console.log(error);
-        return false;
+        return ctx.internalServerError("Error capturing payment");
       }
     },
     async getMyReservations(ctx) {
@@ -196,6 +203,32 @@ module.exports = createCoreController(
         }
       );
       return reservations;
+    },
+
+    async deleteOwn(ctx) {
+      const { id } = ctx.params;
+      const deletedReservation = await strapi.entityService.delete(
+        "api::reservation.reservation",
+        id
+      );
+      return deletedReservation;
+    },
+    async getStripeUrl(ctx) {
+      try {
+        const reservationId = ctx.params.id;
+        const reservation = await strapi.entityService.findOne(
+          "api::reservation.reservation",
+          reservationId
+        );
+        const session = await stripe.checkout.sessions.retrieve(
+          reservation.stripeId
+        );
+        return session.url;
+      } catch (error) {
+        return ctx.notFound(
+          "Error retrieving session/reservation or not found"
+        );
+      }
     },
   })
 );

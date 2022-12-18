@@ -29,7 +29,7 @@
       "relation": "oneToOne",
       "target": "api::location.location"
     },
-    "stripeId": {
+    "stripeUrl": {
       "type": "string"
     },
     "total": {

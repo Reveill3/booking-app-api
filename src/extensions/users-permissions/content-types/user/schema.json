@@ -89,13 +89,16 @@
       "type": "json"
     },
     "insuranceImgs": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": true,
-      "private": true
+      ]
+    },
+    "stripeCustomerId": {
+      "type": "string"
     }
   }
 }
