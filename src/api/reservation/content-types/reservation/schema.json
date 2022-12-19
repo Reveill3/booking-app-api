@@ -30,7 +30,7 @@
       "target": "api::location.location"
     },
     "stripeUrl": {
-      "type": "string"
+      "type": "text"
     },
     "total": {
       "type": "decimal",

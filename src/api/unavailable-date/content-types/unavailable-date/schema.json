@@ -20,6 +20,11 @@
       "relation": "manyToOne",
       "target": "api::car.car",
       "inversedBy": "unavailable_dates"
+    },
+    "reservation": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::reservation.reservation"
     }
   }
 }

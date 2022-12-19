@@ -1,5 +1,6 @@
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 const unparsed = require("koa-body/unparsed.js");
+const { DateTime } = require("luxon");
 
 ("use strict");
 
@@ -35,6 +36,7 @@ module.exports = createCoreController(
 
     async create(ctx) {
       const { location, car, totalDays, start, end } = ctx.request.body;
+
       try {
         const price = await strapi
           .service("api::reservation.reservation")
@@ -68,18 +70,42 @@ module.exports = createCoreController(
             data: reservationObject,
           });
 
+        // create array of dates between start and end using luxon
+        const startDateTime = DateTime.fromISO(start);
+        const endDateTime = DateTime.fromISO(end);
+        const dates = [];
+        let currentDate = startDateTime.plus({ days: 1 });
+        while (currentDate < endDateTime) {
+          dates.push(currentDate.toISODate());
+          currentDate = currentDate.plus({ days: 1 });
+        }
+
+        // for each date in dates array , create unavailableDate with reservation id
+        for (const date of dates) {
+          await strapi
+            .service("api::unavailable-date.unavailable-date")
+            .create({
+              data: {
+                date: date,
+                car,
+                reservation: reservation.id,
+              },
+            });
+        }
+
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           mode: "setup",
           customer: customer.id,
-          success_url: process.env.CLIENT_URL + "?success=true",
-          cancel_url: process.env.CLIENT_URL + "?success=false",
+          success_url:
+            process.env.CLIENT_URL + "/user/reservations?success=true",
+          cancel_url:
+            process.env.CLIENT_URL + "/user/reservations?success=false",
           metadata: {
             total: price,
             reservation: reservation.id,
           },
         });
-        console.log(session.url);
         // add payment intent to reservation
         return await strapi
           .service("api::reservation.reservation")
@@ -207,10 +233,24 @@ module.exports = createCoreController(
 
     async deleteOwn(ctx) {
       const { id } = ctx.params;
+      //delete related unavailable dates
+      const unavailableDates = await strapi.entityService.findMany(
+        "api::unavailable-date.unavailable-date",
+        {
+          filters: { reservation: id },
+        }
+      );
+      for (const date of unavailableDates) {
+        await strapi.entityService.delete(
+          "api::unavailable-date.unavailable-date",
+          date.id
+        );
+      }
       const deletedReservation = await strapi.entityService.delete(
         "api::reservation.reservation",
         id
       );
+
       return deletedReservation;
     },
     async getStripeUrl(ctx) {
@@ -229,6 +269,30 @@ module.exports = createCoreController(
           "Error retrieving session/reservation or not found"
         );
       }
+    },
+
+    async delete(ctx) {
+      //delete related unavailable dates and wrap normal delete
+      const { id } = ctx.params;
+      //delete related unavailable dates
+      const unavailableDates = await strapi.entityService.findMany(
+        "api::unavailable-date.unavailable-date",
+        {
+          filters: { reservation: id },
+        }
+      );
+      for (const date of unavailableDates) {
+        await strapi.entityService.delete(
+          "api::unavailable-date.unavailable-date",
+          date.id
+        );
+      }
+      const deletedReservation = await strapi.entityService.delete(
+        "api::reservation.reservation",
+        id
+      );
+
+      return deletedReservation;
     },
   })
 );
