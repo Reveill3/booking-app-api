@@ -251,6 +251,17 @@ module.exports = createCoreController(
         id
       );
 
+      //Delete stripe paymentIntent using deletedReservation.paymentIntentId
+      if (deletedReservation.paymentIntentId) {
+        try {
+          await stripe.paymentIntents.cancel(
+            deletedReservation.paymentIntentId
+          );
+        } catch (error) {
+          ctx.internalServerError("Error deleting payment intent");
+        }
+      }
+
       return deletedReservation;
     },
     async getStripeUrl(ctx) {
@@ -291,6 +302,17 @@ module.exports = createCoreController(
         "api::reservation.reservation",
         id
       );
+
+      //Delete stripe paymentIntent using deletedReservation.paymentIntentId
+      if (deletedReservation.paymentIntentId) {
+        try {
+          await stripe.paymentIntents.cancel(
+            deletedReservation.paymentIntentId
+          );
+        } catch (error) {
+          ctx.internalServerError("Error deleting payment intent");
+        }
+      }
 
       return deletedReservation;
     },
