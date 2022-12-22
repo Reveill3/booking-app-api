@@ -28,7 +28,7 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::car.car",
-      "inversedBy": "add_ons"
+      "mappedBy": "add_ons"
     },
     "locations": {
       "type": "relation",
