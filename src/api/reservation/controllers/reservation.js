@@ -75,7 +75,7 @@ module.exports = createCoreController(
         const endDateTime = DateTime.fromISO(end);
         const dates = [];
         let currentDate = startDateTime.plus({ days: 1 });
-        while (currentDate < endDateTime) {
+        while (currentDate.toMillis() < endDateTime.toMillis()) {
           dates.push(currentDate.toISODate());
           currentDate = currentDate.plus({ days: 1 });
         }
