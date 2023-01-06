@@ -99,6 +99,12 @@
     },
     "stripeCustomerId": {
       "type": "string"
+    },
+    "insurance_company": {
+      "type": "string"
+    },
+    "drivers_license_number": {
+      "type": "string"
     }
   }
 }

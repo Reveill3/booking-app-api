@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "agreements",
+  "info": {
+    "singularName": "agreement",
+    "pluralName": "agreements",
+    "displayName": "Agreement"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "rental",
+        "walk-around"
+      ]
+    },
+    "reservation": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::reservation.reservation",
+      "inversedBy": "agreements"
+    },
+    "url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "created",
+        "pending_sign",
+        "signed",
+        "cancelled"
+      ]
+    }
+  }
+}

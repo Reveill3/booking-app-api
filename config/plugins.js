@@ -21,4 +21,22 @@ module.exports = ({ env }) => ({
       },
     },
   },
+  email: {
+    config: {
+      provider: "nodemailer",
+      providerOptions: {
+        host: "smtp.gmail.com",
+        port: 465,
+        auth: {
+          user: env("GMAIL_ADDRESS"),
+          pass: env("GMAIL_PASS"),
+        },
+        // ... any custom nodemailer options
+      },
+      settings: {
+        defaultFrom: "reservations@revrentals.net",
+        defaultReplyTo: "austin@revrentals.net",
+      },
+    },
+  },
 });

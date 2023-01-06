@@ -35,7 +35,8 @@ module.exports = createCoreController(
     },
 
     async create(ctx) {
-      const { location, car, totalDays, start, end } = ctx.request.body;
+      const { location, car, totalDays, start, end, add_ons } =
+        ctx.request.body;
 
       try {
         const price = await strapi
@@ -62,6 +63,7 @@ module.exports = createCoreController(
           total: price,
           users_permissions_user: ctx.state.user.id,
           status: "awaiting_session_complete",
+          add_ons,
         };
 
         const reservation = await strapi
@@ -225,7 +227,7 @@ module.exports = createCoreController(
         "api::reservation.reservation",
         {
           filters: { users_permissions_user: ctx.state.user.id },
-          populate: ["car", "location"],
+          populate: ["car", "location", "add_ons"],
         }
       );
       return reservations;

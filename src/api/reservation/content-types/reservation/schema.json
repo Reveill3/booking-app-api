@@ -54,6 +54,17 @@
         "completed",
         "cancelled"
       ]
+    },
+    "agreements": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::agreement.agreement",
+      "mappedBy": "reservation"
+    },
+    "add_ons": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::add-on.add-on"
     }
   }
 }

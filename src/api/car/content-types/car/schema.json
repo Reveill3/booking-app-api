@@ -82,6 +82,15 @@
     },
     "featured": {
       "type": "boolean"
+    },
+    "vin": {
+      "type": "string"
+    },
+    "miles": {
+      "type": "integer"
+    },
+    "plate": {
+      "type": "string"
     }
   }
 }
