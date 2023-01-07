@@ -227,7 +227,7 @@ module.exports = createCoreController(
         "api::reservation.reservation",
         {
           filters: { users_permissions_user: ctx.state.user.id },
-          populate: ["car", "location", "add_ons"],
+          populate: ["car", "location", "add_ons", "users_permissions_user"],
         }
       );
       return reservations;

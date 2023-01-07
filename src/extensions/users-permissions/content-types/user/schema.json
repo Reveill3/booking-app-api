@@ -100,10 +100,13 @@
     "stripeCustomerId": {
       "type": "string"
     },
-    "insurance_company": {
+    "insurance_name": {
       "type": "string"
     },
     "drivers_license_number": {
+      "type": "string"
+    },
+    "insurance_policy": {
       "type": "string"
     }
   }
