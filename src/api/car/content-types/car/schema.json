@@ -91,6 +91,9 @@
     },
     "plate": {
       "type": "string"
+    },
+    "fuel": {
+      "type": "decimal"
     }
   }
 }
