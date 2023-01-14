@@ -16,6 +16,7 @@
     "@strapi/provider-email-nodemailer": "^4.5.5",
     "@strapi/provider-upload-cloudinary": "^4.5.3",
     "@strapi/strapi": "4.5.3",
+    "axios": "^1.2.2",
     "bcrypt": "^5.1.0",
     "better-sqlite3": "7.4.6",
     "joi": "^17.7.0",

@@ -46,6 +46,14 @@
         "hotel",
         "other"
       ]
+    },
+    "open": {
+      "type": "integer",
+      "required": true
+    },
+    "close": {
+      "type": "integer",
+      "required": true
     }
   }
 }

@@ -65,6 +65,9 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::add-on.add-on"
+    },
+    "total_days": {
+      "type": "decimal"
     }
   }
 }

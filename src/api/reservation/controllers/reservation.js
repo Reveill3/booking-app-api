@@ -1,6 +1,8 @@
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 const unparsed = require("koa-body/unparsed.js");
 const { DateTime } = require("luxon");
+const axios = require("axios");
+const logsnag = require("../../../utils/LogSnag.js");
 
 ("use strict");
 
@@ -64,6 +66,7 @@ module.exports = createCoreController(
           users_permissions_user: ctx.state.user.id,
           status: "awaiting_session_complete",
           add_ons,
+          total_days: totalDays,
         };
 
         const reservation = await strapi
@@ -108,6 +111,13 @@ module.exports = createCoreController(
             reservation: reservation.id,
           },
         });
+        //Capture event in Logsnag
+        await logsnag(
+          "Create Reservation",
+          `Reservation created for ${carData.make} ${carData.model} ${carData.year} for ${totalDays} days.\nUser: ${ctx.state.user.first_name} ${ctx.state.user.last_name} \nEmail: ${ctx.state.user.email} \nReservation ID: ${reservation.id} \nReservation Total: ${price}`,
+          "interactions"
+        );
+
         // add payment intent to reservation
         return await strapi
           .service("api::reservation.reservation")
@@ -116,11 +126,14 @@ module.exports = createCoreController(
               stripeUrl: session.url,
             },
           });
-
-        return reservation;
       } catch (error) {
-        ctx.response.status = 500;
-        return { error };
+        //Capture event in Logsnag
+        await logsnag(
+          "Reservation Error",
+          `Error creating reservation for ${ctx.state.user.first_name} ${ctx.state.user.last_name} \nEmail: ${ctx.state.user.email} \nError: ${error}`,
+          "errors"
+        );
+        ctx.internalServerError("Error making reservation", error);
       }
     },
 
@@ -165,7 +178,7 @@ module.exports = createCoreController(
                 capture_method: "manual",
               });
               // add payment intent to reservation
-              return await strapi
+              await strapi
                 .service("api::reservation.reservation")
                 .update(session.metadata.reservation, {
                   data: {
@@ -174,13 +187,18 @@ module.exports = createCoreController(
                     status: "awaiting_auth",
                   },
                 });
+              return paymentIntent;
             } catch (error) {
               ctx.internalServerError("Error on session completed");
             }
-
-            return setupIntent;
           };
-          return await handleSessionCompleted();
+          const response = await handleSessionCompleted();
+          //Capture event in Logsnag
+          await logsnag(
+            "Payment Info Received",
+            `Payment info received for reservation ${event.data.object.metadata.reservation}.\nintentId: ${response.id} \nReservation ID: ${event.data.object.metadata.reservation} \nReservation Total: ${event.data.object.metadata.total}`,
+            "interactions"
+          );
       }
     },
     async authorizePayment(ctx) {
