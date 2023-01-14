@@ -54,6 +54,9 @@
     "close": {
       "type": "integer",
       "required": true
+    },
+    "trip_buffer": {
+      "type": "integer"
     }
   }
 }
