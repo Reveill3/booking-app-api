@@ -76,8 +76,8 @@ module.exports = createCoreController(
           });
 
         // create array of dates between start and end using luxon
-        const startDateTime = DateTime.fromISO(start);
-        const endDateTime = DateTime.fromISO(end);
+        const startDateTime = DateTime.fromISO(start, { setZone: true });
+        const endDateTime = DateTime.fromISO(end, { setZone: true });
         const dates = [];
         let currentDate = startDateTime.plus({ days: 1 });
         while (currentDate.toMillis() < endDateTime.toMillis()) {
