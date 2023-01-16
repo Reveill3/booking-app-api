@@ -43,7 +43,7 @@ module.exports = createCoreController("api::car.car", ({ strapi }) => ({
     const startDateTime = DateTime.fromISO(start_date, { setZone: true });
     const endDateTime = DateTime.fromISO(end_date, { setZone: true });
     const dates = [];
-    let currentDate = startDateTime.plus({ days: 1 });
+    let currentDate = startDateTime;
     while (currentDate < endDateTime) {
       dates.push(currentDate.toISODate());
       currentDate = currentDate.plus({ days: 1 });
@@ -53,7 +53,8 @@ module.exports = createCoreController("api::car.car", ({ strapi }) => ({
     for (const date of dates) {
       // Check if the car is unavailable on this date
       const unavailableDate = car.unavailable_dates.find(
-        (unavailableDate) => unavailableDate.date === date
+        (unavailableDate) =>
+          DateTime.fromISO(unavailableDate.date).toISODate() === date
       );
 
       // If the car is unavailable or reserved, return false
