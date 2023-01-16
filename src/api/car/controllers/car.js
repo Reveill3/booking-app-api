@@ -40,8 +40,8 @@ module.exports = createCoreController("api::car.car", ({ strapi }) => ({
     );
 
     // create array of dates between start and end using luxon
-    const startDateTime = DateTime.fromISO(start_date);
-    const endDateTime = DateTime.fromISO(end_date);
+    const startDateTime = DateTime.fromISO(start_date, { setZone: true });
+    const endDateTime = DateTime.fromISO(end_date, { setZone: true });
     const dates = [];
     let currentDate = startDateTime.plus({ days: 1 });
     while (currentDate < endDateTime) {
