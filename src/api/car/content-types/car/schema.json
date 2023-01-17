@@ -94,6 +94,9 @@
     },
     "fuel": {
       "type": "decimal"
+    },
+    "available": {
+      "type": "boolean"
     }
   }
 }

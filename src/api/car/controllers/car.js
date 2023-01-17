@@ -29,6 +29,10 @@ module.exports = createCoreController("api::car.car", ({ strapi }) => ({
       populate: ["unavailable_dates"],
     });
 
+    if (!car.available) {
+      return false;
+    }
+
     // Get the reservations for the car
     const reservations = await strapi.entityService.findMany(
       "api::reservation.reservation",
