@@ -16,6 +16,7 @@ const { createCoreController } = require("@strapi/strapi").factories;
 
 module.exports = createCoreController("api::car.car", ({ strapi }) => ({
   async isAvailable(ctx) {
+    // Trigger update
     // Validate the request
     const { error } = schema.validate(ctx.request.body);
     if (error) {
